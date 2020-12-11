@@ -24,14 +24,13 @@ accessed via the "menu" implemented by pushing the encoder. By pushing the encod
 the next additional parameter will be selected, and by rotating the encoder
 the parameter value can be changed:
 
-| Additional parameter | Description |
-| --- | --- |
-| P | number of partials. To hear anything this needs to be at least 1 |
-| Amp | amplitude scheme that determines the amplitude of the partials. Some of the algorithms (such as LP, BP, HP) mimic a filter |
-| Slp | slope size of the amplitude scheme. It's the number of partials that are part of the "slope",
-for filter-like amplitude schemes, as the slope gets smaller, the cutpoints become more drastic.|
-| Wave | waveform of the partial (0 is sine wave) |
-| Poly | not implemented yet |
+| Additional parameter | Description | |
+| --- | --- | --- |
+| P | number of partials. To hear anything this needs to be at least 1 | |
+| Amp | amplitude scheme that determines the amplitude of the partials. Some of the algorithms (such as LP, BP, HP) mimic a filter | |
+| Slp | slope size of the amplitude scheme. It's the number of partials that are part of the "slope", for filter-like amplitude schemes, as the slope gets smaller, the cutpoints become more drastic.| |
+| Wave | waveform of the partial (0 is sine wave) | |
+| Poly | not implemented yet | |
 
 # Author
 Francesco 'Frablum' Stablum
