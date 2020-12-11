@@ -13,7 +13,7 @@ Additive synthesis voice
 | Audio Out1 | Main output | All the partials |
 | Audio Out2 | Fundamental | Just the fundamental wave |
 | Audio Out3 | Last partial | |
-| Audio Out1 | Without fundamental | All the partials without the first one|
+| Audio Out4 | Without fundamental | All the partials without the first one|
 | Encoder Push | Next parameter | Round-robin selection of the additional parameters|
 | Encoder Turn | Alter parameter | Changes the currently selected additional parameter |
 
