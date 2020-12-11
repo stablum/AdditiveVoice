@@ -9,7 +9,7 @@ Additive synthesis voice
 | Ctrl1 | 1v/Oct | Fundamental pitch |
 | Ctrl2 | Stretch | Partial/harmonic multiplier of the fundamental |
 | Ctrl3 | Constant | Constant amount that is multiplied by the partial's integer index and added to the partial base frequency |
-| Ctrl4 | Partials amplitude control |  |
+| Ctrl4 | Partials amplitude control | When the amplitude scheme is filter-like, acts like a cutoff |
 | Audio Out1 | Main output | All the partials |
 | Audio Out2 | Fundamental | Just the fundamental wave |
 | Audio Out3 | Last partial | |
