@@ -32,6 +32,12 @@ the parameter value can be changed:
 | Wave | waveform of the partial (0 is sine wave) | |
 | Poly | not implemented yet | |
 
+# How to install this firmware in the daisy patch
+
+A pre-compiled binary firmware `additive_voice.bin` is available in the sub-directory `build/` : <https://github.com/stablum/AdditiveVoice/blob/master/build/additive_voice.bin>
+
+Please use the tool at the page <https://electro-smith.github.io/Programmer/> to write the binary firmware.
+
 # Author
 Francesco 'Frablum' Stablum
 
