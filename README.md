@@ -36,7 +36,7 @@ the parameter value can be changed:
 
 A pre-compiled binary firmware `additive_voice.bin` is available in the sub-directory `build/` : <https://github.com/stablum/AdditiveVoice/blob/master/build/additive_voice.bin>
 
-Please use the tool at the page <https://electro-smith.github.io/Programmer/> to write the binary firmware.
+Please use the tool at the page <https://electro-smith.github.io/Programmer/> to write the binary firmware to the daisy patch.
 
 # Author
 Francesco 'Frablum' Stablum
