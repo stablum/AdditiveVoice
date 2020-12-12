@@ -18,12 +18,13 @@
 #include "daisysp.h"
 #include "daisy_patch.h"
 #include <string>
+#include <math.h>
 
 #define MAX_PARTIALS 100
 #define MIN_PARTIALS 1
 #define STARTUP_PARTIALS 10;
 #define MIN_SLOPE 1
-#define MAX_VOICES 5
+#define MAX_VOICES 1
 
 #define DEFAULT_FONT Font_6x8
 #define ROW_HEIGHT 10
@@ -32,6 +33,7 @@ using namespace daisysp;
 
 DaisyPatch patch;
 Oscillator oscs[MAX_VOICES][MAX_PARTIALS];
+float as[MAX_PARTIALS];
 Parameter constantctrl, stretchctrl, ampctrl;
 float dbg;
 int partials = STARTUP_PARTIALS;
@@ -59,10 +61,12 @@ enum
     A_BP,
     A_HP,
     A_NOTCH,
+    A_COMB,
+    A_COMB_DIFFERENT,
     A_LAST
 };
 
-std::string amps_str[] = { "RE","LP","BP","HP","N"};
+std::string amps_str[] = { "RE","LP","BP","HP","N","C1","C2"};
 std::string wave_str[] = {"Sin","Tri","Saw","Rmp","Sqr","PTr","PSw","PSq"};
 int param_selected = P_PARTIALS;
 
@@ -153,7 +157,31 @@ static void AudioCallback(float **in, float **out, size_t size)
                         a = (par - amp*partials)/(mild);
                     }
                     break;
+		case A_COMB:
+		    {
+			float offsetted = par + mild*2*amp;
+			float tmp =fmod(offsetted,mild)/mild; 
+			if( fmod((offsetted / mild), 2.f) >=1.f) {
+			    a = tmp;
+			} else {
+			    a = 1 - tmp;
+			}
+		    }
+		    break;
+		case A_COMB_DIFFERENT:
+		    {
+			float curr_mild = ((float)mild) / (((float)par)/2.f + 1.f);
+			float offsetted = ((float)par) + curr_mild*2*amp;
+			float tmp =fmod(offsetted,curr_mild)/curr_mild;
+			if( fmod((offsetted / curr_mild), 2.f) >=1.f) {
+			    a = tmp;
+			} else {
+			    a = 1 - tmp;
+			}
+		    }
+		    break;
             }
+	    as[par] = a;
             oscs[voice][par].SetAmp(a);
         }
     }
@@ -196,6 +224,10 @@ void UpdateNormalizer(void)
 	    break;
 	case A_NOTCH:
 	    normalizer = poly*(partials - mild);
+	    break;
+	case A_COMB:
+	case A_COMB_DIFFERENT:
+	    normalizer = poly * partials/2;
 	    break;
     }
 }
@@ -243,6 +275,7 @@ void CheckEncoder(void)
 
 int main(void)
 {
+    int screencycle = 0;
     float samplerate;
     patch.Init(); // Initialize hardware (daisy seed, and patch)
     samplerate = patch.AudioSampleRate();
@@ -282,15 +315,23 @@ int main(void)
 
     patch.StartAdc();
     patch.StartAudio(AudioCallback);
+    
     while(1) 
     {
+	screencycle++;
 	//update the oled
 	patch.display.Fill(false);
 
         //patch.DisplayControls(false);
 	//patch.DelayMs(20);
 	CheckEncoder();
-
+	
+	if(screencycle>9){
+	    screencycle=0;
+	} else {
+	    continue;
+	}
+	
 	patch.display.SetCursor(0,0);
 	std::string str = "F:";
 	float fundv = GetFundV();//fundctrl.Process();
@@ -357,9 +398,21 @@ int main(void)
 	patch.display.WriteString(cstr,DEFAULT_FONT, true);
 	patch.display.Update();
 	patch.display.SetCursor(0,5*ROW_HEIGHT);
-	//str = "Dbg:";
-	//str += std::to_string(((int)(dbg*10000)));
-	//patch.display.WriteString(cstr,DEFAULT_FONT, true);
+	str = "";
+	for(int i = 0 ; i < std::min(partials,30)-1 ; i+=2) {
+            if(as[i] < 0.5 && as[i+1] >= 0.5) {
+		str += "/";
+	    } else if(as[i] >= 0.5 && as[i+1] >= 0.5) {
+		str += "^";
+	    } else if(as[i] >= 0.5 && as[i+1] < 0.5) {
+		str += "\\";
+	    } else if(as[i] >= 0.2 || as[i] >= 0.2) {
+		str +="-";
+	    } else {
+		str +="_";
+	    }
+	}
+	patch.display.WriteString(cstr,DEFAULT_FONT, true);
 	patch.display.Update();
     }
 }

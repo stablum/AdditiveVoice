@@ -32,6 +32,24 @@ the parameter value can be changed:
 | W | waveform of the partial (see dedicated section)| |
 | Poly | not implemented yet | |
 
+# Amplitude schemes
+
+The following algorithms to determine the amplitude of each partial are available:
+
+| On screen | What is it | Description |
+| --- | --- | --- |
+| RE | Reciprocal | if the CTRL4 knob is turned completely left, then the amplitude of each partial is `1/i` where `i` is the partial index. When the CTRL4 knob on turned completely to the right then the order of the amplitudes is reversed. Every position in the middle is a weighted average of the two situations. |
+| LP | Low pass | Similar to a low pass filter, it assigns high amplitudes only to the lower partials |
+| BP | Band pass | Only a window centered on the CTRL4 knob position has high amplitude values |
+| HP | High pass | Analogous to LP, but for the higher partials |
+| N | Notch | Is the opposite of BP: only a selection of partials centered on the CTRL4 knob position have low or mute amplitudes, the others have high amplitude |
+| C1 | Normal comb | Various notches equally spaced that can be shifted with the CTRL4 knob |
+| C2 | Different comb | Similar to C1 but the frequency represented by how many notches are there gets higher as the partial index get higher |
+
+The slopes of LP, HP, BP, N, C1 and C2 are linear: in LP it's just a straight line making a triangle with width set with the `Mld` parameter of amplitudes from 100% of the CTRL4 point to 0% of CTRL4+Mld. With HP it’s the opposite, a triangle that goes from 0% to 100%, while with BP it’s from 100% to 0% at the cutoff point and then back with another triangle to 100%. The same geometry applies to the shape of the notch (`N`) and the various notches in the comb modes (`C1` and `C2`).
+
+On the screen the last line will illustrate graphically the configuration of the amplitude.
+
 # Possible waveforms
 
 The waveforms that one can choose are the ones that are implemented in the DaisySP library and are:
