@@ -67,7 +67,7 @@ The waveforms that one can choose are the ones that are implemented in the Daisy
 
 # How to install this firmware in the daisy patch
 
-A pre-compiled binary firmware `additive_voice.bin` is available in the sub-directory `build/` : <https://github.com/stablum/AdditiveVoice/blob/master/build/additive_voice.bin>
+A pre-compiled binary firmware `additive_voice_latest.bin` is available in the sub-directory `build/` : <https://github.com/stablum/AdditiveVoice/blob/master/build/additive_voice_latest.bin>
 
 Please use the tool at the page <https://electro-smith.github.io/Programmer/> to write the binary firmware to the daisy patch.
 
