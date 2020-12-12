@@ -1,0 +1,8 @@
+2020-12-12  Francesco Stablum
+
+ * Changed naming of some parameters and settings
+ * Human-readable abbreviations of the wave shapes instead of numbers
+ * New "normal" comb filter amplitude scheme C1: various notches that can be shifted with the knob and CV input
+ * New "different" comb filter amplitude scheme C2: similar to C1 but the frequency of the notches gets increases as the partial index get higher
+ * Added a graphical visualization of the amplitude of the first 30 partials by using ASCII tricks
+
