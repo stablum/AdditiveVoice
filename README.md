@@ -12,7 +12,7 @@ Additive synthesis voice
 | Ctrl4 | Partials amplitude control | When the amplitude scheme is filter-like, acts like a cutoff |
 | Audio Out1 | Main output | All the partials |
 | Audio Out2 | Fundamental | Just the fundamental wave |
-| Audio Out3 | Last partial | |
+| Audio Out3 | Last partial | Just the last partial | 
 | Audio Out4 | Without fundamental | All the partials without the first one|
 | Encoder Push | Next parameter | Round-robin selection of the additional parameters|
 | Encoder Turn | Alter parameter | Changes the currently selected additional parameter |
@@ -28,9 +28,24 @@ the parameter value can be changed:
 | --- | --- | --- |
 | P | number of partials. To hear anything this needs to be at least 1 | |
 | Amp | amplitude scheme that determines the amplitude of the partials. Some of the algorithms (such as LP, BP, HP) mimic a filter | |
-| Slp | slope size of the amplitude scheme. It's the number of partials that are part of the "slope", for filter-like amplitude schemes, as the slope gets smaller, the cutpoints become more drastic.| |
-| Wave | waveform of the partial (0 is sine wave) | |
+| Mld | mildness of the slope of the amplitude scheme. It's the number of partials that are part of the partials amplitude ramp. For filter-like amplitude schemes, as the mildness is set as smaller values, the cutpoints become more drastic.| |
+| W | waveform of the partial (see dedicated section)| |
 | Poly | not implemented yet | |
+
+# Possible waveforms
+
+The waveforms that one can choose are the ones that are implemented in the DaisySP library and are:
+
+| On screen | What is it | |
+| --- | --- | --- |
+| Sin | Sine | |
+| Tri | Triangular | |
+| Saw | Sawtooth | |
+| Rmp | Ramp | |
+| Sqr | Square | |
+| PTr | Polyblep Triangular | |
+| PSw | Polyblep Sawtooth | |
+| PSq | Polyblep Square | |
 
 # How to install this firmware in the daisy patch
 

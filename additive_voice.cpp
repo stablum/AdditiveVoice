@@ -20,8 +20,8 @@
 #include <string>
 
 #define MAX_PARTIALS 100
-#define MIN_PARTIALS 0
-#define MAX_POLY 5
+#define MIN_PARTIALS 1
+#define STARTUP_PARTIALS 10;
 #define MIN_SLOPE 1
 #define MAX_VOICES 5
 
@@ -34,11 +34,11 @@ DaisyPatch patch;
 Oscillator oscs[MAX_VOICES][MAX_PARTIALS];
 Parameter constantctrl, stretchctrl, ampctrl;
 float dbg;
-int partials = MIN_PARTIALS;
+int partials = STARTUP_PARTIALS;
 int amps = 0;
 int wave = 0;
 int poly = 1;
-int slope = 4;
+int mild = 4;
 int num_waves = Oscillator::WAVE_LAST;
 float normalizer = MAX_PARTIALS;
 bool encoder_pressed_prev = false;
@@ -46,7 +46,7 @@ enum
 {
     P_PARTIALS,
     P_AMPS,
-    P_SLOPE,
+    P_MILD,
     P_WAVE,
     P_POLY,
     P_LAST
@@ -62,7 +62,8 @@ enum
     A_LAST
 };
 
-std::string amps_str[] = { "EX","LP","BP","HP","N"};
+std::string amps_str[] = { "RE","LP","BP","HP","N"};
+std::string wave_str[] = {"Sin","Tri","Saw","Rmp","Sqr","PTr","PSw","PSq"};
 int param_selected = P_PARTIALS;
 
 float GetFundV(void)
@@ -115,41 +116,41 @@ static void AudioCallback(float **in, float **out, size_t size)
                 case A_LP:
                     if(par < amp*partials) {
                         a = 1;
-                    } else if(par > amp*partials + slope){
+                    } else if(par > amp*partials + mild){
                         a = 0;
                     } else {
-                        a = 1 - (par - amp*partials)/slope;
+                        a = 1 - (par - amp*partials)/mild;
                     }
                     break;
                 case A_BP:
-                    if(par < amp*partials - slope/2) {
+                    if(par < amp*partials - mild) {
                         a = 0;
-                    } else if(par > amp*partials + slope/2){
+                    } else if(par > amp*partials + mild){
                         a = 0;
                     } else if(par < amp*partials){
-                        a = 1 - (amp*partials - par)/(slope/2);
+                        a = 1 - (amp*partials - par)/(mild);
                     } else if(par > amp*partials){
-                        a = 1 - (par - amp*partials)/(slope/2);
+                        a = 1 - (par - amp*partials)/(mild);
                     }
                     break;
                 case A_HP:
                     if(par < amp*partials) {
                         a = 0;
-                    } else if(par > amp*partials + slope){
+                    } else if(par > amp*partials + mild){
                         a = 1;
                     } else {
-                        a = (par - amp*partials)/slope;
+                        a = (par - amp*partials)/mild;
                     }
                     break;
                 case A_NOTCH:
-                    if(par < amp*partials - slope/2) {
+                    if(par < amp*partials - mild) {
                         a = 1;
-                    } else if(par > amp*partials + slope/2){
+                    } else if(par > amp*partials + mild){
                         a = 1;
                     } else if(par < amp*partials){
-                        a = (amp*partials - par)/(slope/2);
+                        a = (amp*partials - par)/(mild);
                     } else if(par > amp*partials){
-                        a = (par - amp*partials)/(slope/2);
+                        a = (par - amp*partials)/(mild);
                     }
                     break;
             }
@@ -191,10 +192,10 @@ void UpdateNormalizer(void)
 	    normalizer = poly*partials;
 	    break;
 	case A_BP:
-	    normalizer = poly*slope/2;
+	    normalizer = poly*mild;
 	    break;
 	case A_NOTCH:
-	    normalizer = poly*(partials - slope/2);
+	    normalizer = poly*(partials - mild);
 	    break;
     }
 }
@@ -221,8 +222,8 @@ void CheckEncoder(void)
 	        amps = A_LAST - 1;
 	    }
             break;
-    	case P_SLOPE:
-            slope = std::min(MAX_PARTIALS,std::max(MIN_SLOPE,(int)(slope + patch.encoder.Increment())));
+    	case P_MILD:
+            mild = std::min(MAX_PARTIALS,std::max(MIN_SLOPE,(int)(mild + patch.encoder.Increment())));
 	    break;
     	case P_WAVE:
             wave = ((int)(wave + patch.encoder.Increment()) % num_waves);
@@ -231,7 +232,7 @@ void CheckEncoder(void)
 	    }
             break;
     	case P_POLY:
-            poly = ((int)(poly + patch.encoder.Increment()) % (MAX_POLY+1));
+            poly = ((int)(poly + patch.encoder.Increment()) % (MAX_VOICES+1));
 	    if(poly <= 0) {
 	        poly = 1;
 	    }
@@ -272,7 +273,7 @@ int main(void)
     str = "Version";
     patch.display.WriteString(cstr, Font_6x8, true);
     patch.display.SetCursor(72,44);
-    str = "0.71";
+    str = VERSION;
     patch.display.WriteString(cstr, Font_7x10, true);
     patch.display.Update();
     patch.DelayMs(2000);
@@ -301,7 +302,7 @@ int main(void)
 	str += "P";
         str += (param_selected == P_PARTIALS)?">":":";
 	str += std::to_string(partials);
-        str += (partials>38||slope>partials?"!":((param_selected == P_PARTIALS)?"<":""));
+        str += (partials>38||mild>partials?"!":((param_selected == P_PARTIALS)?"<":""));
 	char* cstr = &str[0];
 	patch.display.WriteString(cstr, DEFAULT_FONT, true);
 
@@ -310,16 +311,16 @@ int main(void)
         str += (param_selected == P_AMPS)?">":":";
 	str += amps_str[amps];
         str += (param_selected == P_AMPS)?"<":" ";
-	str += "Slp";
-        str += (param_selected == P_SLOPE)?">":":";
-	str += std::to_string(slope);
-        str += (slope>partials?"!":((param_selected == P_SLOPE)?"<":" "));
+	str += "Mld";
+        str += (param_selected == P_MILD)?">":":";
+	str += std::to_string(mild);
+        str += (mild>partials?"!":((param_selected == P_MILD)?"<":" "));
 	patch.display.WriteString(cstr, DEFAULT_FONT, true);
 
 	patch.display.SetCursor(0,2*ROW_HEIGHT);
-	str = "Wave";
+	str = "W";
         str += (param_selected == P_WAVE)?">":":";
-	str += std::to_string(wave);
+	str += wave_str[wave];
         str += (param_selected == P_WAVE)?"<":" ";
 	str += "Poly";
         str += (param_selected == P_POLY)?">":":";

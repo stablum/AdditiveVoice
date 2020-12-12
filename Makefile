@@ -1,5 +1,8 @@
+VERSION=$(shell cat VERSION)
+
+C_DEFS = -DVERSION=\"$(VERSION)\"
 # Project Name
-TARGET = additive_voice
+TARGET = additive_voice_$(VERSION)
 
 # Sources
 CPP_SOURCES = additive_voice.cpp
