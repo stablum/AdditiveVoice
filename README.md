@@ -48,7 +48,7 @@ The following algorithms to determine the amplitude of each partial are availabl
 
 The slopes of LP, HP, BP, N, C1 and C2 are linear: in LP it's just a straight line making a triangle with width set with the `Mld` parameter of amplitudes from 100% of the CTRL4 point to 0% of CTRL4+Mld. With HP it’s the opposite, a triangle that goes from 0% to 100%, while with BP it’s from 100% to 0% at the cutoff point and then back with another triangle to 100%. The same geometry applies to the shape of the notch (`N`) and the various notches in the comb modes (`C1` and `C2`).
 
-On the screen the last line will illustrate graphically the configuration of the amplitude.
+On the screen the last line will illustrate graphically the configuration of the amplitudes of the first 30 partials.
 
 # Possible waveforms
 
