@@ -6,8 +6,8 @@ Additive synthesis voice
 
 | Control | Description | Comment |
 | --- | --- | --- |
-| Ctrl1 | 1v/Oct | Fundamental pitch |
-| Ctrl2 | Stretch | Partial/harmonic multiplier of the fundamental |
+| Ctrl1 | Fundamental | 1V/Oct Fundamental pitch |
+| Ctrl2 | Stretch | 1V/Oct Partial/harmonic multiplier of the fundamental. It's expressed as linear voltage, so an increment of one octave results in an increment of 1 of the multiplier, resulting in an harmonic outcome. |
 | Ctrl3 | Constant | Constant amount that is multiplied by the partial's integer index and added to the partial base frequency |
 | Ctrl4 | Partials amplitude control | When the amplitude scheme is filter-like, acts like a cutoff |
 | Audio Out1 | Main output | All the partials |

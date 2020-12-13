@@ -70,6 +70,12 @@ std::string amps_str[] = { "RE","LP","BP","HP","N","C1","C2"};
 std::string wave_str[] = {"Sin","Tri","Saw","Rmp","Sqr","PTr","PSw","PSq"};
 int param_selected = P_PARTIALS;
 
+float vtof(float voltage)
+{
+    float freq = powf(2.f, voltage) * 55;
+    return freq;
+}
+
 float GetFundV(void)
 {
     float in = patch.GetCtrlValue((DaisyPatch::Ctrl)0);
@@ -77,12 +83,12 @@ float GetFundV(void)
     return voltage;
 }
 
-float vtof(float voltage)
+float GetStretchV(void)
 {
-    float freq = powf(2.f, voltage) * 55;
-    return freq;
+    float in = patch.GetCtrlValue((DaisyPatch::Ctrl)1);
+    float voltage = in * 5.0f;
+    return voltage;
 }
-
 static void AudioCallback(float **in, float **out, size_t size)
 {
     float sum, con, stretch, amp, a, fundf, fundv;
@@ -90,7 +96,7 @@ static void AudioCallback(float **in, float **out, size_t size)
 
     patch.UpdateAnalogControls();
 
-    stretch = stretchctrl.Process();
+    stretch = GetStretchV();//stretchctrl.Process();
     con = constantctrl.Process();
     amp = ampctrl.Process();
 
@@ -286,7 +292,7 @@ int main(void)
         }
     }
     //fundctrl.Init(patch.controls[patch.CTRL_1], 10.0, 110.0f, Parameter::LINEAR);
-    stretchctrl.Init(patch.controls[patch.CTRL_2], 0.0, 5.0, Parameter::EXPONENTIAL);
+    //stretchctrl.Init(patch.controls[patch.CTRL_2], 0.0, 5.0, Parameter::EXPONENTIAL);
     constantctrl.Init(patch.controls[patch.CTRL_3], 0.0, 5000.0, Parameter::EXPONENTIAL);
     ampctrl.Init(patch.controls[patch.CTRL_4], 0.0, 1.0f, Parameter::LINEAR);
 
@@ -326,7 +332,7 @@ int main(void)
 	//patch.DelayMs(20);
 	CheckEncoder();
 	
-	if(screencycle>9){
+	if(screencycle>1000){
 	    screencycle=0;
 	} else {
 	    continue;
@@ -369,7 +375,7 @@ int main(void)
         str += (param_selected == P_POLY)?"<":"";
 	patch.display.WriteString(cstr, DEFAULT_FONT, true);
 
-	float stretch = stretchctrl.Process();
+	float stretch = GetStretchV();//stretchctrl.Process();
 	patch.display.SetCursor(0,3*ROW_HEIGHT);
 	str = "Stretch:";
 	if(stretch<0){
