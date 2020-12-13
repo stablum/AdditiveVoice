@@ -2,7 +2,7 @@ Version 0.75
 2020-12-12 Francesco Stablum
 
  * Stretch parameter is now represented in 1V/Octave format, so C0 is a
-   multiplier of 0, C1 => 2, C3 => 3 etc. This results in more harmonic results
+   multiplier of 0, C1 => 1, C2=> 2, C3 => 3 etc. This results in more harmonic results
    in modulating this parameter.
 
 Version 0.74
