@@ -20,29 +20,34 @@
 #include <string>
 #include <math.h>
 
-#define MAX_PARTIALS 100
 #define MIN_PARTIALS 1
-#define STARTUP_PARTIALS 10;
-#define MIN_SLOPE 1
-#define MAX_VOICES 1
+#define STARTUP_PARTIALS 30;
+#define STARTUP_AMPS 5
+#define STARTUP_WAVE 0
+#define STARTUP_POLY 1
+#define STARTUP_MILD 7
+#define TRANSPOSE_OCTAVES -1
 
+#define MIN_SLOPE 1 
+#define MAX_VOICES 1
+#define MAXP 80
 #define DEFAULT_FONT Font_6x8
 #define ROW_HEIGHT 10
 using namespace daisy;
 using namespace daisysp;
 
 DaisyPatch patch;
-Oscillator oscs[MAX_VOICES][MAX_PARTIALS];
-float as[MAX_PARTIALS];
+Oscillator oscs[MAX_VOICES][MAXP];
+float as[MAXP];
 Parameter constantctrl, stretchctrl, ampctrl;
 float dbg;
 int partials = STARTUP_PARTIALS;
-int amps = 0;
-int wave = 0;
-int poly = 1;
-int mild = 4;
+int amps = STARTUP_AMPS;
+int wave = STARTUP_WAVE;
+int poly = STARTUP_POLY;
+int mild = STARTUP_MILD;
 int num_waves = Oscillator::WAVE_LAST;
-float normalizer = MAX_PARTIALS;
+float normalizer = MAXP;
 bool encoder_pressed_prev = false;
 enum
 {
@@ -65,9 +70,9 @@ enum
     A_COMB_DIFFERENT,
     A_LAST
 };
-
-std::string amps_str[] = { "RE","LP","BP","HP","N","C1","C2"};
+std::string amps_str[] = { "RE","LP","BP","HP","N","CN","CD"};
 std::string wave_str[] = {"Sin","Tri","Saw","Rmp","Sqr","PTr","PSw","PSq"};
+int max_partials[]     = { 40  , MAXP, MAXP, MAXP, MAXP, 40  , 40  , 40  };
 int param_selected = P_PARTIALS;
 
 float vtof(float voltage)
@@ -79,7 +84,7 @@ float vtof(float voltage)
 float GetFundV(void)
 {
     float in = patch.GetCtrlValue((DaisyPatch::Ctrl)0);
-    float voltage = in * 5.0f;
+    float voltage = in * 5.0f + TRANSPOSE_OCTAVES ;
     return voltage;
 }
 
@@ -92,7 +97,7 @@ float GetStretchV(void)
 static void AudioCallback(float **in, float **out, size_t size)
 {
     float sum, con, stretch, amp, a, fundf, fundv;
-    float samples[MAX_PARTIALS];
+    float samples[MAXP];
 
     patch.UpdateAnalogControls();
 
@@ -100,16 +105,34 @@ static void AudioCallback(float **in, float **out, size_t size)
     con = constantctrl.Process();
     amp = ampctrl.Process();
 
+    bool sync = patch.gate_input[0].Trig();
+
     for (int voice=0; voice < poly; voice++) {
         if(voice==0) {
             fundv = GetFundV();
-            fundf = vtof(fundv);
+	    fundf = vtof(fundv); 
         } else {
             continue;
         }
         for (int par=0; par < partials; par++) {
             
-            oscs[voice][par].SetFreq(fundf + par*fundf*stretch + par*con);
+	    float freq = fundf + par*fundf*stretch + par*con;
+	    freq += vtof(in[0][0] * 5.0f);
+	    /*
+	    if(par % 2 == 0){
+		freq += in[1][0] * 100;
+		freq += in[2][0] * 100;
+	    } else {
+		freq -= in[1][0] * 100;
+	    }
+	    if(par%3 == 2) {
+		freq -= in[3][0] * 100;
+	    }*/
+	    if(sync) {
+	        oscs[voice][par].Reset();
+	        oscs[voice][par].PhaseAdd(in[3][0]*((float)par)/((float)partials));
+	    }
+            oscs[voice][par].SetFreq(freq);
             //oscs[j].SetFreq(fundf+(j*con));
 
             oscs[voice][par].SetWaveform(wave);
@@ -193,9 +216,6 @@ static void AudioCallback(float **in, float **out, size_t size)
     }
     for (size_t i = 0; i < size; i ++)
     {
-        // Read Knobs
-        // Set osc params
-        //.Process
     	sum = 0;
 
         for (int par=0; par < partials; par++) {
@@ -209,11 +229,6 @@ static void AudioCallback(float **in, float **out, size_t size)
 	out[1][i] = samples[0];
 	out[2][i] = samples[partials-1];
 	out[3][i] = (sum - samples[0])/(normalizer-1);
-        // Assign Synthesized Waveform to all four outputs.
-        //for (size_t chn = 0; chn < 4; chn++)
-        //{
-        //    out[chn][i] = sig;
-        //}
     }
 }
 
@@ -238,6 +253,11 @@ void UpdateNormalizer(void)
     }
 }
 
+void UpdatePartialsAmount(int increment)
+{
+    partials = std::min(max_partials[wave],std::max(MIN_PARTIALS,(int)(partials + increment)));
+}
+
 void CheckEncoder(void)
 {
     patch.DebounceControls();
@@ -252,7 +272,7 @@ void CheckEncoder(void)
     }
     switch(param_selected) {
     	case P_PARTIALS:
-            partials = std::min(MAX_PARTIALS,std::max(MIN_PARTIALS,(int)(partials + patch.encoder.Increment())));
+	    UpdatePartialsAmount(patch.encoder.Increment());
             break;
     	case P_AMPS:
             amps = ((int)(amps + patch.encoder.Increment()) % A_LAST);
@@ -261,13 +281,14 @@ void CheckEncoder(void)
 	    }
             break;
     	case P_MILD:
-            mild = std::min(MAX_PARTIALS,std::max(MIN_SLOPE,(int)(mild + patch.encoder.Increment())));
+            mild = std::min(MAXP,std::max(MIN_SLOPE,(int)(mild + patch.encoder.Increment())));
 	    break;
     	case P_WAVE:
             wave = ((int)(wave + patch.encoder.Increment()) % num_waves);
 	    if(wave < 0) {
 	        wave = num_waves - 1;
 	    }
+	    UpdatePartialsAmount(0);
             break;
     	case P_POLY:
             poly = ((int)(poly + patch.encoder.Increment()) % (MAX_VOICES+1));
@@ -287,7 +308,7 @@ int main(void)
     samplerate = patch.AudioSampleRate();
    
     for(int voice=0; voice<MAX_VOICES; voice++){
-	for(int par=0; par<MAX_PARTIALS; par++){
+	for(int par=0; par<MAXP; par++){
 	    oscs[voice][par].Init(samplerate); // Init oscillator
         }
     }
@@ -332,7 +353,7 @@ int main(void)
 	//patch.DelayMs(20);
 	CheckEncoder();
 	
-	if(screencycle>1000){
+	if(screencycle>3000){
 	    screencycle=0;
 	} else {
 	    continue;
@@ -343,6 +364,8 @@ int main(void)
 	float fundv = GetFundV();//fundctrl.Process();
         float fundf = vtof(fundv);
 	str += std::to_string((int)fundv);
+	str += ".";
+	str += std::to_string((int)(abs(fundv)*10)%10);
 	str += ":";
 	str += std::to_string((int)fundf);
 	str += "Hz ";

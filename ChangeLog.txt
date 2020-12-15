@@ -1,9 +1,26 @@
+Version 0.76
+2020-12-15 Francesco Stablum
+ * The audio input 1 is now an LFO or audio-rate frequency modulation input.  
+   This input is not DC-coupled, so patching constant voltages will not work. 
+   Anyways, it's possible to add LFOs or even audio rate modulation to it. 
+   The input voltage follows the 1V/Octave convention, so an LFO that peaks 
+   at +1V and -1V will make the frequencies of all the partials shift of one 
+   octave higher and one lower.
+ * The Gate input 1 is now a sync input to to reset the phase of all the 
+   partials. The phase is configured from Audio input 4
+ * Capped maximum value of the partials to avoid glitches: maximum value is 
+   now 40 for Sine and the Poly\* waveforms, 80 for all other waveforms
+ * Renamed acronym for normal comb and different comb
+ * The fundamental is transposed one octave lower
+ * Changed the startup preset to something more interesting (30 partials, comb)
+ * 1 decimal value floating point print of fundamental input voltage
+
 Version 0.75
 2020-12-12 Francesco Stablum
 
  * Stretch parameter is now represented in 1V/Octave format, so C0 is a
    multiplier of 0, C1 => 1, C2=> 2, C3 => 3 etc. This results in more harmonic results
-   in modulating this parameter.
+   in sending pitch information to this parameter.
 
 Version 0.74
 2020-12-12  Francesco Stablum
