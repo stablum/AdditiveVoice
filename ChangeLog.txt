@@ -7,10 +7,20 @@ Version 0.76
    at +1V and -1V will make the frequencies of all the partials shift of one 
    octave higher and one lower.
  * The Gate input 1 is now a sync input to to reset the phase of all the 
-   partials. The phase is configured from Audio input 4
+   partials. The phase is configured from Audio input 4 in this way:
+   when the sampled input is 0, then all phases are zero; 
+   with larger inputs the phase spread among the partials is getting larger. 
+   This means that the first partial will always be reset with phase 0 and the 
+   last partial is going to have the largest phase value: 
+   consider the last partial: the input value is divided by 5 and multiplied 
+   by 2\*pi (hence voltages from 0 to 5V represent the entire circle). 
+   All the partials between the first and the last will have intermediate 
+   phase values that are also proportional to the partial index. 
+   This means that the new phase of the partial with index `p` is calculated 
+   as `in4*(2*pi)*p/(5*maxp)` 
  * Capped maximum value of the partials to avoid glitches: maximum value is 
    now 40 for Sine and the Poly\* waveforms, 80 for all other waveforms
- * Renamed acronym for normal comb and different comb
+ * Renamed acronym for normal comb and different comb to CN and CD
  * The fundamental is transposed one octave lower
  * Changed the startup preset to something more interesting (30 partials, comb)
  * 1 decimal value floating point print of fundamental input voltage
